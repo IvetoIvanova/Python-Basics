@@ -1,6 +1,17 @@
 import random
 
-words = ["python", "developer", "console", "programming", "challenge"]
+try:
+    with open("words.txt", "r", encoding="utf-8") as file:
+        words = [line.strip() for line in file if line.strip()]
+except FileNotFoundError:
+    print("Error: words.txt not found! Please create the file and add words.")
+    exit()
+
+if not words:
+    print("Error: words.txt is empty! Please add some words.")
+    exit()
+
+# words = ["python", "developer", "console", "programming", "challenge"]
 word = random.choice(words)
 scrambled = list(word)
 random.shuffle(scrambled)

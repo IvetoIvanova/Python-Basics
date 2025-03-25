@@ -24,9 +24,7 @@
 2. **Download the script or clone the repository.**
 3. **Run the script:**
    ```sh
-   python 
-   
-   unscramble_it.py
+   python unscramble_it.py
 
 ## 🚀 Future Improvements
 
