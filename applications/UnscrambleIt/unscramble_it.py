@@ -44,8 +44,13 @@ if not selected_words:
     exit()
 
 
-def play_turn(player_name):
-    word = random.choice(selected_words)
+def play_turn(player_name, words_pool):
+    if not words_pool:
+        print(f"\nNo more words left! {player_name} can't play this round.")
+        return 0
+
+    word = random.choice(words_pool)
+    words_pool.remove(word)
     scrambled = list(word)
     random.shuffle(scrambled)
     scrambled = "".join(scrambled)
@@ -55,15 +60,20 @@ def play_turn(player_name):
 
     attempts = 3
     for i in range(attempts):
-        guess = input(f"Attempt {i + 1}/{attempts} - Unscramble the word: ").strip().lower()
+        guess = input(f"Attempt {i + 1}/{attempts} - Unscramble the word (or type 'end' to stop): ").strip().lower()
+
+        if guess == "end":
+            print(f"{player_name} chose to end the game.")
+            return "end"
+
         if guess == word.lower():
             print(f"{player_name} guessed the word correctly!")
-            return True
+            return 1
         else:
             print(f"Wrong answer! You have {attempts - (i + 1)} attempts left.")
 
     print(f"Game over! The correct word was '{word}'.")
-    return False
+    return 0
 
 
 print("\nWelcome to 'Unscramble it!'")
@@ -76,18 +86,52 @@ if mode == "2":
 
     print(f"\n{player1} vs {player2} - Let’s see who unscrambles more words! 🚀")
 
-    score1 = play_turn(player1)
-    score2 = play_turn(player2)
+    score1, score2 = 0, 0
+    words_left = selected_words.copy()
 
-    if score1 and score2:
-        print("\nIt's a tie! Both players guessed their words correctly!")
-    elif score1:
-        print(f"\n🏆 {player1} wins!")
-    elif score2:
-        print(f"\n🏆 {player2} wins!")
+    while words_left:
+        result = play_turn(player1, words_left)
+        if result == "end":
+            break
+        score1 += result
+
+        if not words_left:
+            break
+
+        result = play_turn(player2, words_left)
+        if result == "end":
+            break
+        score2 += result
+
+        print(f"\nCurrent Score: {player1} - {score1} | {player2} - {score2}")
+        print("-" * 40)
+
+    print("\nFinal Score:")
+    print(f"{player1}: {score1} points")
+    print(f"{player2}: {score2} points")
+
+    if score1 > score2:
+        print(f"🏆 {player1} wins!")
+    elif score2 > score1:
+        print(f"🏆 {player2} wins!")
     else:
-        print("\nNo one guessed correctly. Better luck next time!")
+        print("It's a tie!")
 
 else:
     print("\nSingleplayer mode selected!")
-    play_turn("Player")
+    player_score = 0
+    words_left = selected_words.copy()
+
+    while words_left:
+        result = play_turn("Player", words_left)
+        if result == "end":
+            break
+        player_score += result
+
+        print(f"\nYour Score: {player_score}")
+        print("-" * 40)
+
+    print(f"\nGame over! Final Score: {player_score} points.")
+
+if not words_left:
+    print("\nNo more words left! If you want to play more rounds, add new words to 'words.txt'.")
